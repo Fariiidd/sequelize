@@ -1,5 +1,5 @@
 let db = require('../database/models');
-let sequelize = db.sequelize;
+let Op = db.sequelize.Op;
 
 let moviesControllers =  {
    list: function(req, res){
@@ -28,12 +28,25 @@ let moviesControllers =  {
        })
    },
 
-   serchMovie: (function(req, res){
-       db.Movies.findAll(req.params.serch)
-       .then(function(result){
-           res.render('listMovies', {movies: result})
+   searchMovie: function(req, res){
+       db.Movies.findAll({
+           where: {
+               title: {[Op]: '%'+ req.body.search +'%'},
+               order: [
+                  ['title', 'ASC'],
+               ]
+           }
        })
-   })
+       .then(function(result){
+           if(result =! ''){
+            res.render('listMovies', {movies: result});
+           }
+    })
+       .catch(function(error){
+           console.error(error);
+           
+       })
+   }
 
 
 }
